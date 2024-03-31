@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jugaaad Hackathon</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="home-page">
+
+<h2>JUGAAD HACKATHON </h2>
+<nav class="navbar">
+  <a href="/anu_hack/note.html">Note Making</a>
+  
+  <a href="/anu_hack/blog.html">Blog Writing</a>
+  <a href="#contact"> </a>
+  <a href="/anu_hack/to.html">To-Do List</a>
+  <a href="/anu_hack/signup.html">Signup</a>
+</nav>
+
+<div id="trendingSection" class="trending-section">
+  <h3></h3>
+  <div id="trendingContent" class="trending-content">
+    <!-- Trending blogs will be dynamically populated here -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/serpapi@1.0.0"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const trendingContent = document.getElementById('trendingContent');
+  
+  // Specify the keywords for which you want to fetch Google Trends data
+  const keywords = "coffee,milk,bread,pasta,steak";
+
+  // Fetch Google Trends data using SerpApi
+  window.serpapiJsonp('google_trends', {
+    q: keywords,
+    timeframe: 'today 5-y', // Specify the timeframe for the trends data
+    api_key: "6e0480c911f705a32837cc0b86fa3ff877e67dd17036c9c6776a619cf17d9ef9"
+  }, function(data) {
+    if (data.error) {
+      console.error('Error fetching Google Trends data:', data.error);
+      return;
+    }
+
+    // Process the fetched data
+    const trendData = data.interest_over_time;
+    trendData.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.classList.add('trending-item');
+      itemElement.innerHTML = `
+        <h4>${item['formattedTime']}</h4>
+        <p>Interest: ${item['value']}</p>
+      `;
+      trendingContent.appendChild(itemElement);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

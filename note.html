@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Note Making</title>
+<link rel="stylesheet" href="note.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Note Maker</h1>
+  <div class="form">
+    <input type="text" id="noteInput" placeholder="Enter your note">
+    <button onclick="addNote()">Add Note</button>
+    <button id="micButton" onclick="toggleMicrophone()">Start Mic</button>
+  </div>
+  <ul id="noteList"></ul>
+</div>
+
+<script>
+  // Array to store notes
+  let notes = [];
+
+  // Function to add a new note
+  function addNote() {
+    const noteInput = document.getElementById('noteInput');
+    const noteText = noteInput.value.trim();
+    if (noteText !== '') {
+      const newNote = {
+        id: Date.now(),
+        text: noteText
+      };
+      notes.push(newNote);
+      displayNotes();
+      noteInput.value = '';
+    }
+  }
+
+  // Function to display notes
+  function displayNotes() {
+    const noteList = document.getElementById('noteList');
+    noteList.innerHTML = '';
+    notes.forEach(note => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>${note.text}</span>
+        <button onclick="editNote(${note.id})">Edit</button>
+        <button onclick="deleteNote(${note.id})">Delete</button>
+      `;
+      noteList.appendChild(li);
+    });
+  }
+
+  // Function to edit a note
+  function editNote(id) {
+    const updatedText = prompt('Edit your note:');
+    if (updatedText !== null) {
+      const noteIndex = notes.findIndex(note => note.id === id);
+      if (noteIndex !== -1) {
+        notes[noteIndex].text = updatedText.trim();
+        displayNotes();
+      }
+    }
+  }
+
+  // Function to delete a note
+  function deleteNote(id) {
+    notes = notes.filter(note => note.id !== id);
+    displayNotes();
+  }
+
+  // Function to toggle microphone
+  function toggleMicrophone() {
+    const micButton = document.getElementById('micButton');
+    if (micButton.textContent === 'Start Mic') {
+      micButton.textContent = 'Stop Mic';
+      startSpeechRecognition();
+    } else {
+      micButton.textContent = 'Start Mic';
+      stopSpeechRecognition();
+    }
+  }
+
+  // Function to start speech recognition
+  function startSpeechRecognition() {
+    const recognition = new webkitSpeechRecognition(); // for Chrome
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = function(event) {
+      const result = event.results[event.results.length - 1];
+      const transcript = result[0].transcript.trim();
+      document.getElementById('noteInput').value += transcript + ' ';
+    };
+
+    recognition.onerror = function(event) {
+      console.error('Speech recognition error:', event.error);
+    };
+
+    recognition.onend = function() {
+      console.log('Speech recognition ended');
+    };
+
+    recognition.start();
+  }
+
+  // Function to stop speech recognition
+  function stopSpeechRecognition() {
+    const recognition = new webkitSpeechRecognition(); // for Chrome
+    recognition.stop();
+  }
+</script>
+
+</body>
+</html>
